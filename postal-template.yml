@@ -28,7 +28,10 @@
     tls_enabled: false
   dns:
     mx_records:
-      - mx.${POSTAL_WEB_HOST}
-    smtp_server_hostname: ${POSTAL_SMTP_HOST}
+      - mx.postal.fivelink.lol
+    smtp_server_hostname: smtp.fivelink.lol
+    spf_include: spf.postal.fivelink.lol
+    return_path_domain: rp.postal.fivelink.lol
+    track_domain: track.postal.fivelink.lol
   rails:
     secret_key: ${SECRET_KEY}
