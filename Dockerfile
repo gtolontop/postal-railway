@@ -2,55 +2,13 @@
 
   USER root
 
-  COPY <<EOF /start.sh
-  #!/bin/bash
-  set -e
-  echo "=== Starting Postal Setup ==="
-  mkdir -p /config
-
-  cat > /config/postal.yml << YAMLEND
-  web:
-    host: \${POSTAL_WEB_HOST}
-    protocol: https
-  main_db:
-    host: \${MYSQL_HOST}
-    port: \${MYSQL_PORT}
-    username: \${MYSQL_USER}
-    password: "\${MYSQL_PASSWORD}"
-    database: \${MYSQL_DATABASE}
-    pool_size: 5
-  message_db:
-    host: \${MYSQL_HOST}
-    port: \${MYSQL_PORT}
-    username: \${MYSQL_USER}
-    password: "\${MYSQL_PASSWORD}"
-    prefix: postal_msg_
-  rabbitmq:
-    host: \${RABBITMQ_HOST}
-    port: \${RABBITMQ_PORT}
-    username: \${RABBITMQ_USER}
-    password: "\${RABBITMQ_PASSWORD}"
-    vhost: \${RABBITMQ_VHOST}
-  smtp_server:
-    port: 25
-    tls_enabled: false
-  dns:
-    mx_records:
-      - mx.\${POSTAL_WEB_HOST}
-    smtp_server_hostname: \${POSTAL_SMTP_HOST}
-  rails:
-    secret_key: \${SECRET_KEY}
-  YAMLEND
-
-  echo "=== Config generated ==="
-  cat /config/postal.yml
-  echo "=== Initializing DB ==="
-  postal initialize || echo "Already done"
-  echo "=== Starting server ==="
-  exec /docker-entrypoint.sh "\$@"
-  EOF
-
-  RUN chmod +x /start.sh
+  RUN echo "IyEvYmluL2Jhc2gKc2V0IC1lCmVjaG8gIj09PSBTdGFydGluZyBQb3N0YWwgU2V0dXAgPT09Igpta2RpciAtcCAvY29uZmlnCgpjYXQgPiAvY29uZmlnL3Bvc3RhbC55bWwgPDwgWUFNTEVORAp3ZWI6CiAgaG9zdDogJHtQT1NUQUxfV0VCX0hPU1R9CiAgcHJvdG9jb2w6IGh0dH    
+  BzCm1haW5fZGI6CiAgaG9zdDogJHtNWVNRTF9IT1NUfQogIHBvcnQ6ICR7TVNRX1BPUlR9CiAgdXNlcm5hbWU6ICR7TVNRX1VTRVJ9CiAgcGFzc3dvcmQ6ICIke01ZU1FMX1BBU1NXT1JEfSIKICBkYXRhYmFzZTogJHtNWVNRTF9EQVRBQkFTRX0KICBwb29sX3NpemU6IDUKbWVzc2FnZV9kYj    
+  oKICBob3N0OiAke01ZU1FMX0hPU1R9CiAgcG9ydDogJHtNWVNRTF9QT1JUfQogIHVzZXJuYW1lOiAke01ZU1FMX1VTRVJ9CiAgcGFzc3dvcmQ6ICIke01ZU1FMX1BBU1NXT1JEfSIKICBwcmVmaXg6IHBvc3RhbF9tc2dfCnJhYmJpdG1xOgogIGhvc3Q6ICR7UkFCQklUTVFfSE9TVH0KICBwb3    
+  J0OiAke1JBQkJJVE1RX1BPUlR9CiAgdXNlcm5hbWU6ICR7UkFCQklUTVFfVVNFUn0KICBwYXNzd29yZDogIiR7UkFCQklUTVFfUEFTU1dPUkR9IgogIHZob3N0OiAke1JBQkJJVE1RX1ZIT1NUfQpzbXRwX3NlcnZlcjoKICBwb3J0OiAyNQogIHRsc19lbmFibGVkOiBmYWxzZQpkbnM6CiAgbX    
+  hfcmVjb3JkczoKICAgIC0gbXguJHtQT1NUQUxfV0VCX0hPU1R9CiAgc210cF9zZXJ2ZXJfaG9zdG5hbWU6ICR7UE9TVEFMX1NNVFBfSE9TVH0KcmFpbHM6CiAgc2VjcmV0X2tleTogJHtTRUNSRVRfS0VZfQpZQU1MRU5ECgplY2hvICI9PT0gQ29uZmlnIGdlbmVyYXRlZCA9PT0iCmNhdCAvY2    
+  9uZmlnL3Bvc3RhbC55bWwKZWNobyAiPT09IEluaXRpYWxpemluZyBEQiA9PT0iCnBvc3RhbCBpbml0aWFsaXplIHx8IGVjaG8gIkFscmVhZHkgZG9uZSIKZWNobyAiPT09IFN0YXJ0aW5nIHNlcnZlciA9PT0iCmV4ZWMgL2RvY2tlci1lbnRyeXBvaW50LnNoICIkQCIK" | base64 -d >       
+  /start.sh && chmod +x /start.sh
 
   ENTRYPOINT ["/bin/bash", "/start.sh"]
   CMD ["postal", "web-server"]
