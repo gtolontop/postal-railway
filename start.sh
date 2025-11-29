@@ -4,6 +4,6 @@
   cat /config/postal.yml
   postal initialize || true
   echo "=== Creating admin user ==="
-  echo -e "admin@fivelink.lol\nFivelink\nAdmin\nSecurePass123!" | postal make-user || echo "User exists"      
+  echo -e "admin@fivelink.lol\nFivelink\nAdmin\motdepasse" | postal make-user || echo "User exists"      
   echo "=== Starting server ==="
   exec /docker-entrypoint.sh "$@"
