@@ -5,58 +5,68 @@
 
   mkdir -p /config
 
-  cat > /config/postal.yml << EOFCONFIG
+  cat > /config/postal.yml << 'EOFCONFIG'
   web:
-    host: ${POSTAL_WEB_HOST:-postal.example.com}
+    host: POSTAL_WEB_HOST_PLACEHOLDER
     protocol: https
 
   main_db:
-    host: ${MYSQL_HOST:-localhost}
-    port: ${MYSQL_PORT:-3306}
-    username: ${MYSQL_USER:-root}
-    password: "${MYSQL_PASSWORD:-}"
-    database: ${MYSQL_DATABASE:-postal}
+    host: MYSQL_HOST_PLACEHOLDER
+    port: MYSQL_PORT_PLACEHOLDER
+    username: MYSQL_USER_PLACEHOLDER
+    password: "MYSQL_PASSWORD_PLACEHOLDER"
+    database: MYSQL_DATABASE_PLACEHOLDER
     pool_size: 5
 
   message_db:
-    host: ${MYSQL_HOST:-localhost}
-    port: ${MYSQL_PORT:-3306}
-    username: ${MYSQL_USER:-root}
-    password: "${MYSQL_PASSWORD:-}"
+    host: MYSQL_HOST_PLACEHOLDER
+    port: MYSQL_PORT_PLACEHOLDER
+    username: MYSQL_USER_PLACEHOLDER
+    password: "MYSQL_PASSWORD_PLACEHOLDER"
     prefix: postal_msg_
 
   rabbitmq:
-    host: ${RABBITMQ_HOST:-localhost}
-    port: ${RABBITMQ_PORT:-5672}
-    username: ${RABBITMQ_USER:-guest}
-    password: "${RABBITMQ_PASSWORD:-}"
-    vhost: ${RABBITMQ_VHOST:-/}
+    host: RABBITMQ_HOST_PLACEHOLDER
+    port: RABBITMQ_PORT_PLACEHOLDER
+    username: RABBITMQ_USER_PLACEHOLDER
+    password: "RABBITMQ_PASSWORD_PLACEHOLDER"
+    vhost: RABBITMQ_VHOST_PLACEHOLDER
 
   smtp_server:
-    port: ${SMTP_PORT:-25}
+    port: 25
     tls_enabled: false
     proxy_protocol: false
 
   dns:
     mx_records:
-      - mx.${POSTAL_WEB_HOST:-postal.example.com}
-    smtp_server_hostname: ${POSTAL_SMTP_HOST:-smtp.example.com}
-    spf_include: spf.${POSTAL_WEB_HOST:-postal.example.com}
-    return_path_domain: rp.${POSTAL_WEB_HOST:-postal.example.com}
-    track_domain: track.${POSTAL_WEB_HOST:-postal.example.com}
+      - mx.postal.fivelink.lol
+    smtp_server_hostname: smtp.fivelink.lol
+    spf_include: spf.postal.fivelink.lol
+    return_path_domain: rp.postal.fivelink.lol
+    track_domain: track.postal.fivelink.lol
 
   rails:
-    secret_key: ${SECRET_KEY:-default_secret_key_change_me}
+    secret_key: SECRET_KEY_PLACEHOLDER
   EOFCONFIG
 
-  echo "=== postal.yml generated ==="
+  sed -i "s/POSTAL_WEB_HOST_PLACEHOLDER/${POSTAL_WEB_HOST:-postal.example.com}/g" /config/postal.yml
+  sed -i "s/MYSQL_HOST_PLACEHOLDER/${MYSQL_HOST:-localhost}/g" /config/postal.yml
+  sed -i "s/MYSQL_PORT_PLACEHOLDER/${MYSQL_PORT:-3306}/g" /config/postal.yml
+  sed -i "s/MYSQL_USER_PLACEHOLDER/${MYSQL_USER:-root}/g" /config/postal.yml
+  sed -i "s/MYSQL_PASSWORD_PLACEHOLDER/${MYSQL_PASSWORD:-}/g" /config/postal.yml
+  sed -i "s/MYSQL_DATABASE_PLACEHOLDER/${MYSQL_DATABASE:-postal}/g" /config/postal.yml
+  sed -i "s/RABBITMQ_HOST_PLACEHOLDER/${RABBITMQ_HOST:-localhost}/g" /config/postal.yml
+  sed -i "s/RABBITMQ_PORT_PLACEHOLDER/${RABBITMQ_PORT:-5672}/g" /config/postal.yml
+  sed -i "s/RABBITMQ_USER_PLACEHOLDER/${RABBITMQ_USER:-guest}/g" /config/postal.yml
+  sed -i "s/RABBITMQ_PASSWORD_PLACEHOLDER/${RABBITMQ_PASSWORD:-}/g" /config/postal.yml
+  sed -i "s/RABBITMQ_VHOST_PLACEHOLDER/${RABBITMQ_VHOST:-\/}/g" /config/postal.yml
+  sed -i "s/SECRET_KEY_PLACEHOLDER/${SECRET_KEY:-defaultkey}/g" /config/postal.yml
 
-  # Initialize database if not already done
-  echo "=== Checking if database needs initialization ==="
-  if ! postal db:status > /dev/null 2>&1; then
-    echo "=== Initializing Postal database ==="
-    postal initialize || true
-  fi
+  echo "=== postal.yml generated ==="
+  cat /config/postal.yml
+
+  echo "=== Initializing Postal database ==="
+  postal initialize || echo "Already initialized"
 
   echo "=== Starting Postal ==="
   exec /docker-entrypoint.sh "$@"
