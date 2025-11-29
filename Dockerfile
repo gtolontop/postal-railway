@@ -2,43 +2,55 @@
 
   USER root
 
-  RUN echo '#!/bin/bash\n\
-  set -e\n\
-  mkdir -p /config\n\
-  echo "web:" > /config/postal.yml\n\
-  echo "  host: ${POSTAL_WEB_HOST}" >> /config/postal.yml\n\
-  echo "  protocol: https" >> /config/postal.yml\n\
-  echo "main_db:" >> /config/postal.yml\n\
-  echo "  host: ${MYSQL_HOST}" >> /config/postal.yml\n\
-  echo "  port: ${MYSQL_PORT}" >> /config/postal.yml\n\
-  echo "  username: ${MYSQL_USER}" >> /config/postal.yml\n\
-  echo "  password: ${MYSQL_PASSWORD}" >> /config/postal.yml\n\
-  echo "  database: ${MYSQL_DATABASE}" >> /config/postal.yml\n\
-  echo "  pool_size: 5" >> /config/postal.yml\n\
-  echo "message_db:" >> /config/postal.yml\n\
-  echo "  host: ${MYSQL_HOST}" >> /config/postal.yml\n\
-  echo "  port: ${MYSQL_PORT}" >> /config/postal.yml\n\
-  echo "  username: ${MYSQL_USER}" >> /config/postal.yml\n\
-  echo "  password: ${MYSQL_PASSWORD}" >> /config/postal.yml\n\
-  echo "  prefix: postal_msg_" >> /config/postal.yml\n\
-  echo "rabbitmq:" >> /config/postal.yml\n\
-  echo "  host: ${RABBITMQ_HOST}" >> /config/postal.yml\n\
-  echo "  port: ${RABBITMQ_PORT}" >> /config/postal.yml\n\
-  echo "  username: ${RABBITMQ_USER}" >> /config/postal.yml\n\
-  echo "  password: ${RABBITMQ_PASSWORD}" >> /config/postal.yml\n\
-  echo "  vhost: ${RABBITMQ_VHOST}" >> /config/postal.yml\n\
-  echo "smtp_server:" >> /config/postal.yml\n\
-  echo "  port: 25" >> /config/postal.yml\n\
-  echo "  tls_enabled: false" >> /config/postal.yml\n\
-  echo "dns:" >> /config/postal.yml\n\
-  echo "  mx_records:" >> /config/postal.yml\n\
-  echo "    - mx.${POSTAL_WEB_HOST}" >> /config/postal.yml\n\
-  echo "  smtp_server_hostname: ${POSTAL_SMTP_HOST}" >> /config/postal.yml\n\
-  echo "rails:" >> /config/postal.yml\n\
-  echo "  secret_key: ${SECRET_KEY}" >> /config/postal.yml\n\
-  cat /config/postal.yml\n\
-  postal initialize || echo "Already initialized"\n\
-  exec /docker-entrypoint.sh "$@"' > /start.sh && chmod +x /start.sh
+  COPY <<EOF /start.sh
+  #!/bin/bash
+  set -e
+  echo "=== Starting Postal Setup ==="
+  mkdir -p /config
+
+  cat > /config/postal.yml << YAMLEND
+  web:
+    host: \${POSTAL_WEB_HOST}
+    protocol: https
+  main_db:
+    host: \${MYSQL_HOST}
+    port: \${MYSQL_PORT}
+    username: \${MYSQL_USER}
+    password: "\${MYSQL_PASSWORD}"
+    database: \${MYSQL_DATABASE}
+    pool_size: 5
+  message_db:
+    host: \${MYSQL_HOST}
+    port: \${MYSQL_PORT}
+    username: \${MYSQL_USER}
+    password: "\${MYSQL_PASSWORD}"
+    prefix: postal_msg_
+  rabbitmq:
+    host: \${RABBITMQ_HOST}
+    port: \${RABBITMQ_PORT}
+    username: \${RABBITMQ_USER}
+    password: "\${RABBITMQ_PASSWORD}"
+    vhost: \${RABBITMQ_VHOST}
+  smtp_server:
+    port: 25
+    tls_enabled: false
+  dns:
+    mx_records:
+      - mx.\${POSTAL_WEB_HOST}
+    smtp_server_hostname: \${POSTAL_SMTP_HOST}
+  rails:
+    secret_key: \${SECRET_KEY}
+  YAMLEND
+
+  echo "=== Config generated ==="
+  cat /config/postal.yml
+  echo "=== Initializing DB ==="
+  postal initialize || echo "Already done"
+  echo "=== Starting server ==="
+  exec /docker-entrypoint.sh "\$@"
+  EOF
+
+  RUN chmod +x /start.sh
 
   ENTRYPOINT ["/bin/bash", "/start.sh"]
   CMD ["postal", "web-server"]
