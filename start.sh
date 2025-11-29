@@ -6,6 +6,6 @@
   echo "=== Creating admin user ==="
   echo -e "admin@fivelink.lol\nFivelink\nAdmin\nmotdepasse" | postal make-user || echo "User exists"
   echo "=== Starting worker in background ==="
-  postal run-worker &
+  postal worker &
   echo "=== Starting web server ==="
-  postal run-web
+  postal web-server
